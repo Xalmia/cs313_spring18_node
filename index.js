@@ -6,4 +6,7 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
+  .get('/public/mail', function(req, res) {
+    
+  })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
