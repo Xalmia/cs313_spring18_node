@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "node test.js",
-    "push": "git push heroku; git push github master"
+    "push": "git push heroku master"
   },
   "dependencies": {
     "ejs": "^2.5.6",
