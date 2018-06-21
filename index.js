@@ -10,7 +10,7 @@ app.get('/', (res, req) => {
 
 app.get('/getPackage', (res, req) => {
   req.send("Hello there.");
-})
+}) 
 
 app.listen(5000, (res, req) => {
   console.log("Listening on port 5000");
