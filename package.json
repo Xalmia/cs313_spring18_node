@@ -8,8 +8,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node test.js",
-    "push": "$(git push github master; git push heroku master)"
+    "test": "node test.js"
   },
   "dependencies": {
     "ejs": "^2.5.6",
