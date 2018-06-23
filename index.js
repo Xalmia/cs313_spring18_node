@@ -3,18 +3,120 @@ const path = require('path');
 const PORT = process.env.PORT || 5000
 
 var app = express();
+var url = require('url');
 
 app.get('/', (res, req) => {
   req.sendFile(path.join(__dirname, 'public', 'mail.html'));
 })
 
 app.get('/getPackage', (res, req) => {
-  req.send("Hello there.");
+  var requestUrl = url.parse(request.url, true);
+  console.log("Query parameters: " + JSON.stringify(requestUrl.query))
+
+  // get the variables from the request header
+  var weight = Number(requestUrl.query.weight);
+  var mailType = requestUrl.query.type;
+
+  handlePackage(res, weight, mailType);
 }) 
 
 app.listen(PORT, (res, req) => {
   console.log("Listening on port" + PORT);
 })
+
+function handlePackage(res, weight, mailType){
+  var result = findPrice(mailType);
+
+  var params = {mailType: mailType, weight: weight, result: result};
+
+  res.render(path.normalize("/views/pages/result"), params);
+}
+
+function findPrice(mailType){
+  var result = 0.0;
+
+  if (mailType == "Letters (Stamped)"){
+    if (num < 1){
+    result = .5;
+    } else if (num < 2) {
+      result = .71;
+    } else if (num < 3) {
+      result = .92;
+    } else if (num < 3.5) {
+      result = 1.13;
+    }
+    else {
+      return 0;
+    }
+  } else if ("Letters (Metered)"){
+    if (num < 1){
+      result = .47;
+      } else if (num < 2) {
+        result = .68;
+      } else if (num < 3) {
+        result = .92;
+      } else if (num < 3.5) {
+        result = 1.10;
+      }
+      else {
+        result = 0;
+      }
+  } else if ("Large Envelopes (Flats)"){
+    if (num < 1){
+      result = 1.0;
+      } else if (num < 2) {
+        result = 1.21
+      } else if (num < 3) {
+        result = 1.42
+      } else if (num < 4) {
+        result = 1.36
+      } else if (num < 5) {
+        result = 1.84
+      } else if (num < 6) {
+        result = 2.05
+      } else if (num < 7) {
+        result = 2.26
+      } else if (num < 8) {
+        result = 2.47
+      } else if (num < 9) {
+        result = 2.68
+      } else if (num < 10) {
+        result = 2.89
+      } else if (num < 11) {
+        result = 3.10
+      } else if (num < 12) {
+        result = 3.31
+      } else if (num < 13) {
+        result = 3.52
+      } else {
+        return 0;
+      }
+  } else if ("First-Class Package Service--Retail"){
+      if (num < 4) {
+        result = 3.5
+      } else if (num < 8) {
+        result = 3.75
+      } else if (num < 9) {
+        result = 4.10
+      } else if (num < 10) {
+        result = 4.45
+      } else if (num < 11) {
+        result = 4.80
+      } else if (num < 12) {
+        result = 5.15
+      } else if (num < 13) {
+        result = 5.50
+      } else {
+        return 0;
+      }
+  } else {
+    // Something is wrong, report and display the error.
+    console.log("There was an error in the response.");
+  }
+
+  return result;
+}
+
 /*
 express()
   .use(express.static(path.join(__dirname, 'public')))

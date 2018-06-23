@@ -19,7 +19,6 @@ app.get('/math', function(request, response) {
 });
 
 function handleMath(request, response) {
-	var requestUrl = url.parse(request.url, true);
 
 	console.log("Query parameters: " + JSON.stringify(requestUrl.query));
 
