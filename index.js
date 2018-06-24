@@ -13,7 +13,7 @@ app.get('/', (res, req) => {
 })
 
 app.get('/getPackage', (res, req) => {
-  var requestUrl = url.parse(request.url, true);
+  var requestUrl = url.parse(req.url, true);
   console.log("Query parameters: " + JSON.stringify(requestUrl.query))
 
   // get the variables from the request header
