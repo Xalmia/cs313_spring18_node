@@ -40,75 +40,75 @@ function findPrice(mailType, num){
   var result = 0.0;
 
   if (mailType == "Letters (Stamped)"){
-    if (num < 1){
+    if (num <= 1){
     result = .5;
-    } else if (num < 2) {
+    } else if (num <= 2) {
       result = .71;
-    } else if (num < 3) {
+    } else if (num <= 3) {
       result = .92;
-    } else if (num < 3.5) {
+    } else if (num <= 3.5) {
       result = 1.13;
     }
     else {
       return 0;
     }
   } else if ("Letters (Metered)"){
-    if (num < 1){
+    if (num <= 1){
       result = .47;
-      } else if (num < 2) {
+      } else if (num <= 2) {
         result = .68;
-      } else if (num < 3) {
+      } else if (num <= 3) {
         result = .92;
-      } else if (num < 3.5) {
+      } else if (num <= 3.5) {
         result = 1.10;
       }
       else {
         result = 0;
       }
   } else if ("Large Envelopes (Flats)"){
-    if (num < 1){
+    if (num <= 1){
       result = 1.0;
-      } else if (num < 2) {
+      } else if (num <= 2) {
         result = 1.21
-      } else if (num < 3) {
+      } else if (num <= 3) {
         result = 1.42
-      } else if (num < 4) {
+      } else if (num <= 4) {
         result = 1.36
-      } else if (num < 5) {
+      } else if (num <= 5) {
         result = 1.84
-      } else if (num < 6) {
+      } else if (num <= 6) {
         result = 2.05
-      } else if (num < 7) {
+      } else if (num <= 7) {
         result = 2.26
-      } else if (num < 8) {
+      } else if (num <= 8) {
         result = 2.47
-      } else if (num < 9) {
+      } else if (num <= 9) {
         result = 2.68
-      } else if (num < 10) {
+      } else if (num <= 10) {
         result = 2.89
-      } else if (num < 11) {
+      } else if (num <= 11) {
         result = 3.10
-      } else if (num < 12) {
+      } else if (num <= 12) {
         result = 3.31
-      } else if (num < 13) {
+      } else if (num <= 13) {
         result = 3.52
       } else {
         return 0;
       }
   } else if ("First-Class Package Service--Retail"){
-      if (num < 4) {
+      if (num <= 4) {
         result = 3.5
-      } else if (num < 8) {
+      } else if (num <= 8) {
         result = 3.75
-      } else if (num < 9) {
+      } else if (num <= 9) {
         result = 4.10
-      } else if (num < 10) {
+      } else if (num <= 10) {
         result = 4.45
-      } else if (num < 11) {
+      } else if (num <= 11) {
         result = 4.80
-      } else if (num < 12) {
+      } else if (num <= 12) {
         result = 5.15
-      } else if (num < 13) {
+      } else if (num <= 13) {
         result = 5.50
       } else {
         return 0;
