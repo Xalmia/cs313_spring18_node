@@ -13,13 +13,15 @@ app.get('/', (res, req) => {
 })
 
 app.get('/getPackage', (res, req) => {
-  var requestUrl = url.parse(req.url, true);
-  console.log("Query parameters: " + JSON.stringify(requestUrl.query))
+
 
   // get the variables from the request header
-  var weight = Number(requestUrl.query.weight);
-  var mailType = requestUrl.query.type;
+  var weight = Number(req.query.weight);
+  var mailType = req.query.type;
 
+  console.log("Weight: " + weight);
+  console.log("Mail Type: " + mailType);
+  
   handlePackage(res, weight, mailType);
 }) 
 
