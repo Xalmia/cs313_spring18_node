@@ -29,14 +29,14 @@ app.listen(PORT, (req, res) => {
 })
 
 function handlePackage(res, weight, mailType){
-  var result = findPrice(mailType);
+  var result = findPrice(mailType, weight);
 
   var params = {mailType: mailType, weight: weight, result: result};
 
   res.render(path.normalize("pages/result"), params);
 }
 
-function findPrice(mailType){
+function findPrice(mailType, num){
   var result = 0.0;
 
   if (mailType == "Letters (Stamped)"){
