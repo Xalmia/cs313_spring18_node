@@ -5,6 +5,9 @@ const PORT = process.env.PORT || 5000
 var app = express();
 var url = require('url');
 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
 app.get('/', (res, req) => {
   req.sendFile(path.join(__dirname, 'public', 'mail.html'));
 })
@@ -29,7 +32,7 @@ function handlePackage(res, weight, mailType){
 
   var params = {mailType: mailType, weight: weight, result: result};
 
-  res.render(path.normalize("/views/pages/result"), params);
+  res.render(path.normalize("pages/result"), params);
 }
 
 function findPrice(mailType){
