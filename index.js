@@ -3,16 +3,15 @@ const path = require('path');
 const PORT = process.env.PORT || 5000
 
 var app = express();
-var url = require('url');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-app.get('/', (res, req) => {
+app.get('/', (req, res) => {
   req.sendFile(path.join(__dirname, 'public', 'mail.html'));
 })
 
-app.get('/getPackage', (res, req) => {
+app.get('/getPackage', (req, res) => {
 
 
   // get the variables from the request header
@@ -25,7 +24,7 @@ app.get('/getPackage', (res, req) => {
   handlePackage(res, weight, mailType);
 }) 
 
-app.listen(PORT, (res, req) => {
+app.listen(PORT, (req, res) => {
   console.log("Listening on port" + PORT);
 })
 
