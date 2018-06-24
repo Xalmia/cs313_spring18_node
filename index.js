@@ -8,7 +8,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  req.sendFile(path.join(__dirname, 'public', 'mail.html'));
+  res.sendFile(path.join(__dirname, 'public', 'mail.html'));
 })
 
 app.get('/getPackage', (req, res) => {
