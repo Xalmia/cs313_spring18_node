@@ -23,40 +23,39 @@ app.set('port', PORT)
     console.log("listening on port: " + PORT);
 });
 
+// since there is no EJS to render JUST yet, just use the json display engine
 function getJournal(req, res) {
-    res.render("Getting Journal information to DB");
+    res.json({get: "success", type: "journal"});
 }
 
 function getSection(req, res) {
-    res.render("Getting Section information to DB");
+    res.json({get: "success", type: "section"});
 }
 
 function getPage(req, res) {
-    res.render("Getting Page information to DB");
+    res.json({get: "success", type: "page"});
 }
 
 function postJournal(req, res) {
-    
-    res.render("Posting Journal information to DB");
+    res.json({post: "success", type: "journal"});
 }
 
 function postSection(req, res) {
-    res.render("Posting Section information to DB");
-    
+    res.json({post: "success", type: "section"});
 }
 
 function postPage(req, res) {
-    res.render("Posting Page information to DB");
+    res.json({post: "success", type: "page"});
 }
 
 function putJournal(req, res) {
-    res.render("Modifying Journal information in DB!");
+    res.json({put: "success", type: "journal"});
 }
 
 function putSection(req, res) {
-    res.render("Modifying Section information in DB!");
+    res.json({put: "success", type: "section"});
 }
 
 function putPage(req, res) {
-    res.render("Modifying Page information in DB!");
+    res.json({put: "success", type: "page"});
 }
