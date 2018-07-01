@@ -26,7 +26,20 @@ app.set('port', PORT)
 
 // since there is no EJS to render JUST yet, just use the json display engine
 function getJournal(req, res) {
-    res.json({get: "success", type: "journal"});
+    userId = req.query.id;
+    // TODO: This query needs to be joined with the User table though the user_journal table
+    var query = "SELECT * FROM journal";
+    //var params = [userId];
+
+    pool.query(query, null, (err, result) => {
+        if (err || result == null) {
+            console.log("Error making Query: " + err);
+            res.json({success: false, data:err});
+        } else {
+            console.log("Found result: " + JSON.stringify(result));
+            res.json(result);
+        }
+    });
 }
 
 function getSection(req, res) {
