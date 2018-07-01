@@ -8,7 +8,7 @@ const { Pool } = require('pg');
 const connectionString = process.env.DATABASE_URL || "postgres://journal_user:journal_pass@localhost:5432/journal"
 const pool = new Pool({connectionString: connectionString});
 
-app.get('/', (req, res) => {res.render("Hello");})
+app.get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html'));})
    .listen(PORT, () => {
     console.log("listening on port: " + PORT);
 });
