@@ -28,10 +28,12 @@ app.set('port', PORT)
 function getJournal(req, res) {
     userId = req.query.id;
     // TODO: This query needs to be joined with the User table though the user_journal table
-    var query = "SELECT * FROM journal";
-    //var params = [userId];
+    var query = "SELECT user_file.user_id, journal.journal_id, journal.journal_title FROM user_file" +
+    " INNER JOIN user_journal ON user_file.user_id = user_journal.user_fk AND user_journal.user_fk = $1" +
+    " INNER JOIN journal ON user_journal.journal_fk = journal.journal_id;";
+    var params = [userId];
 
-    pool.query(query, null, (err, result) => {
+    pool.query(query, params, (err, result) => {
         if (err || result == null) {
             console.log("Error making Query: " + err);
             res.json({success: false, data:err});
