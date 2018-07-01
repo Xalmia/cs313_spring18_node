@@ -9,7 +9,7 @@ const connectionString = process.env.DATABASE_URL || "postgres://journal_user:jo
 const pool = new Pool({connectionString: connectionString});
 
 app.set('port', PORT)
-   //.get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html'));})
+   .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html'));})
    .get('/getJournal', getJournal)
    .get('/getSection', getSection)
    .get('/getPage', getPage)
