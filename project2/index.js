@@ -2,13 +2,14 @@ var express = require('express');
 var app = express();
 var path = require('path');
 var PORT = process.env.PORT || 5000
-
+var methodOverride = require('method-override');
 const { Pool } = require('pg');
 
 const connectionString = process.env.DATABASE_URL || "postgres://journal_user:journal_pass@localhost:5432/journal"
 const pool = new Pool({connectionString: connectionString});
 
 app.set('port', PORT)
+   .use(methodOverride('_method'))
    .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html'));})
    .get('/getJournal', getJournal)
    .get('/getSection', getSection)
