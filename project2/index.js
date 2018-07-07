@@ -45,11 +45,40 @@ function getJournal(req, res) {
 }
 
 function getSection(req, res) {
-    res.json({get: "success", type: "section"});
+    journalId = req.query.journalId;
+    var query = "SELECT journal.journal_id, section_in_journal.section_id, section_in_journal.section_title FROM journal" +
+    " INNER JOIN journal_section ON journal.journal_id = journal_section.journal_fk AND journal_section.section_fk = $1" +
+    " INNER JOIN section_in_journal ON journal_section.section_fk = section_in_journal.section_id;"; 
+    var params = [journalId];
+
+  
+    pool.query(query, params, (err, result) => {
+        if (err || result == null){
+            console.log("Error getting section: " + error);
+            res.json({success: false, data:err});
+        } else {
+            console.log("Found result: " + JSON.stringify(result));
+            res.json(result);
+        }
+    });
 }
 
 function getPage(req, res) {
-    res.json({get: "success", type: "page"});
+    sectionId = req.query.sectionId;
+    var query = "SELECT section_in_journal.section_id, page_in_journal.page_id, page_in_journal.page_title FROM section_in_journal" +
+    " INNER JOIN section_page ON section_in_journal.section_id = section_page.section_fk AND section_page.section_fk = $1" +
+    " INNER JOIN page_in_journal ON section_page.section_fk = page_in_journal.page_id;"; 
+    var params = [sectionId];
+  
+    pool.query(query, params, (err, result) => {
+        if (err || result == null){
+            console.log("Error getting section: " + error);
+            res.json({success: false, data:err});
+        } else {
+            console.log("Found result: " + JSON.stringify(result));
+            res.json(result);
+        }
+    });
 }
 
 function postJournal(req, res) {
