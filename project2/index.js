@@ -15,6 +15,8 @@ app.set('port', PORT)
    .get('/getJournal', getJournal)
    .get('/getSection', getSection)
    .get('/getPage', getPage)
+   .get('/getEntries', getEntries)
+   .get('/getTextData', getTextData)
    .post('/postJournal', postJournal)
    .post('/postSection', postSection)
    .post('/postPage', postPage)
@@ -55,11 +57,11 @@ function getSection(req, res) {
   
     pool.query(query, params, (err, result) => {
         if (err || result == null){
-            console.log("Error getting section: " + error);
+            console.log("Error getting section: " + err);
             res.json({success: false, data:err});
         } else {
-            console.log("Found result: " + JSON.stringify(result));
-            res.json(result);
+            console.log("Found result: " + JSON.stringify(result.rows));
+            res.json(result.rows);
         }
     });
 }
@@ -68,16 +70,51 @@ function getPage(req, res) {
     sectionId = req.query.sectionId;
     var query = "SELECT section_in_journal.section_id, page_in_journal.page_id, page_in_journal.page_title FROM section_in_journal" +
     " INNER JOIN section_page ON section_in_journal.section_id = section_page.section_fk AND section_page.section_fk = $1" +
-    " INNER JOIN page_in_journal ON section_page.section_fk = page_in_journal.page_id;"; 
+    " INNER JOIN page_in_journal ON section_page.page_fk = page_in_journal.page_id;"; 
     var params = [sectionId];
-  
+
     pool.query(query, params, (err, result) => {
         if (err || result == null){
-            console.log("Error getting section: " + error);
+            console.log("Error getting section: " + err);
             res.json({success: false, data:err});
         } else {
-            console.log("Found result: " + JSON.stringify(result));
-            res.json(result);
+            console.log("Found result: " + JSON.stringify(result.rows));
+            res.json(result.rows);
+        }
+    });
+}
+
+function getEntries(req, res) {
+    pageId = req.query.pageId;
+    var query = "SELECT page_in_journal.page_id, text_box.text_box_id FROM page_in_journal" +
+    " INNER JOIN page_text ON page_in_journal.page_id = page_text.page_fk AND page_text.page_fk = $1" +
+    " INNER JOIN text_box ON page_text.text_fk = page_in_journal.page_id;"; 
+    var params = [pageId];
+
+    pool.query(query, params, (err, result) => {
+        if (err || result == null){
+            console.log("Error getting section: " + err);
+            res.json({success: false, data:err});
+        } else {
+            console.log("Found result: " + JSON.stringify(result.rows));
+            res.json(result.rows);
+        }
+    });
+}
+
+function getTextData(req, res) {
+    textBoxId = req.query.textBoxId;
+    //pageId = req.query.pageId;
+    var query = "SELECT text_content FROM text_box WHERE text_box_id = $1";
+    //var query2 = "SELECT page_title FROM page_in_journal WHERE page_id = $1";
+    params = [textBoxId/*, pageId*/];
+    pool.query(query, params, (err, result) => {
+        if (err || result == null){
+            console.log("Error getting section: " + err);
+            res.json({success: false, data:err});
+        } else {
+            console.log("Found result: " + JSON.stringify(result.rows));
+            res.json(result.rows);
         }
     });
 }
