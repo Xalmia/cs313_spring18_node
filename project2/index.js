@@ -10,7 +10,7 @@ const pool = new Pool({connectionString: connectionString});
 
 app.set('port', PORT)
    .use(methodOverride('_method'))
-   .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html'));})
+   .use(express.static(__dirname + '/public'))
    .get('/getJournal', getJournal)
    .get('/getSection', getSection)
    .get('/getPage', getPage)
@@ -38,8 +38,8 @@ function getJournal(req, res) {
             console.log("Error making Query: " + err);
             res.json({success: false, data:err});
         } else {
-            console.log("Found result: " + JSON.stringify(result));
-            res.json(result);
+            console.log("Found result: " + JSON.stringify(result.rows));
+            res.json(result.rows);
         }
     });
 }

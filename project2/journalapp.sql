@@ -84,6 +84,9 @@ VALUES ('Test Section');
 INSERT INTO journal (journal_title)
 VALUES ('Test Journal');
 
+INSERT INTO section_in_journal(section_title)
+VALUES ('Test Section 2');
+
 INSERT INTO user_file(username, user_password)
 VALUES ('test_user_1', 'test_pass');
 
@@ -98,6 +101,9 @@ VALUES ('1', '1');
 
 INSERT INTO page_text(page_fk, text_fk)
 VALUES ('1', '1');
+
+INSERT INTO journal_section(journal_fk, section_fk)
+VALUES ('2', '2');
 
 CREATE USER journal_user WITH PASSWORD 'journal_pass';
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO journal_user;
