@@ -10,7 +10,8 @@ const pool = new Pool({connectionString: connectionString});
 
 app.set('port', PORT)
    .use(methodOverride('_method'))
-   .use(express.static(__dirname + '/public'))
+   .use(express.static(__dirname + "/public"))
+   .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'main.html'));})
    .get('/getJournal', getJournal)
    .get('/getSection', getSection)
    .get('/getPage', getPage)
