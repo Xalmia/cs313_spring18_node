@@ -6,7 +6,7 @@ function displayJournals() {
     // run an AJAX request for the data in getJournal in index.js
     $.get(url, (result) => {
         for (data in result){
-            $("#journals").append("<li>" + result[data].journal_title + "</li>")
+            $("#journals").append("<li>" + result[data].journal_title + "<button onclick=\'displaySections(" + result[data].journal_id + ")\'><i></i></button></li>")
         }
         console.log(result);
         //$("#journals").append()
@@ -16,7 +16,7 @@ function displayJournals() {
 }
 
 function displaySections(journalId) {
-
+    console.log(journalId);
 }
 
 function displayPages(sectionId) {
