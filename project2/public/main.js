@@ -7,7 +7,7 @@ function displayJournals() {
     $.get(url, (result) => {
         if (result != null){
             for (data in result){
-                $("#journals").append("<li class=\'no-dot\'>" + result[data].journal_title + "<button onclick=\'displaySections(" + result[data].journal_id + ")\'><i></i></button></li>")
+                $("#journals").append("<li class=\'no-dot\'>" + result[data].journal_title + "<button onclick=\'displaySections(" + result[data].journal_id + ")\'><i class=\'right\'</i></button></li>")
             }
         } else if(result.success == false){
             console.log ("Query failed.");
@@ -30,7 +30,7 @@ function displaySections(journalId) {
         if (result != null){
             $("#sections").empty();
             for (data in result){
-                $("#sections").append("<li class=\'no-dot\'>" + result[data].section_title + "<button onclick=\'displayPages(" + result[data].section_id + ")\'><i></i></button></li>");
+                $("#sections").append("<li class=\'no-dot\'>" + result[data].section_title + "<button onclick=\'displayPages(" + result[data].section_id + ")\'><i class=\'right\'</i></button></li>");
             }
         } else if(result.success == false){
             console.log ("Query failed.");
@@ -51,7 +51,7 @@ function displayPages(sectionId) {
         if (result != null){
             $("#pages").empty();
             for (data in result){
-                $("#pages").append("<li class=\'no-dot\'>" + result[data].page_title + "<button onclick=\'displayEntries(" + result[data].page_id + ")\'><i></i></button></li>");
+                $("#pages").append("<li class=\'no-dot\'>" + result[data].page_title + "<button onclick=\'displayEntries(" + result[data].page_id + ")\'><i class=\'right\'</i></button></li>");
             }
         } else if(result.success == false){
             console.log ("Query failed.");
@@ -73,7 +73,7 @@ function displayEntries(pageId){
             $("#entries").empty();
             var count = 1;
             for (data in result){
-                $("#entries").append("<li class=\'no-dot\'> Entry #" + count++ + "<button onclick=\'loadSelectedPage(" + result[data].text_box_id + ", " + pageId + ")\'><i></i></button></li>");
+                $("#entries").append("<li class=\'no-dot\'> Entry #" + count++ + "<button onclick=\'loadSelectedPage(" + result[data].text_box_id + ", " + pageId + ")\'><i class=\'right\'</i></button></li>");
             }
         } else if(result.success == false){
             console.log ("Query failed.");
