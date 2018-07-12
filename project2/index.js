@@ -49,9 +49,12 @@ function getJournal(req, res) {
 
 function getSection(req, res) {
     journalId = req.query.journalId;
-    var query = "SELECT journal.journal_id, section_in_journal.section_id, section_in_journal.section_title FROM journal" +
-    " INNER JOIN journal_section ON journal.journal_id = journal_section.journal_fk AND journal_section.section_fk = $1" +
-    " INNER JOIN section_in_journal ON journal_section.section_fk = section_in_journal.section_id;"; 
+
+    console.log(journalId);
+
+    var query = "SELECT journal.journal_id, section.section_id, section.section_title FROM journal" +
+    " INNER JOIN journal_section ON journal.journal_id = journal_section.journal_fk AND journal_section.journal_fk = $1" +
+    " INNER JOIN section ON journal_section.section_fk = section.section_id;"; 
     var params = [journalId];
 
   
@@ -68,9 +71,9 @@ function getSection(req, res) {
 
 function getPage(req, res) {
     sectionId = req.query.sectionId;
-    var query = "SELECT section_in_journal.section_id, page_in_journal.page_id, page_in_journal.page_title FROM section_in_journal" +
-    " INNER JOIN section_page ON section_in_journal.section_id = section_page.section_fk AND section_page.section_fk = $1" +
-    " INNER JOIN page_in_journal ON section_page.page_fk = page_in_journal.page_id;"; 
+    var query = "SELECT section.section_id, page_in_section.page_id, page_in_section.page_title FROM section" +
+    " INNER JOIN section_page ON section.section_id = section_page.section_fk AND section_page.section_fk = $1" +
+    " INNER JOIN page_in_section ON section_page.page_fk = page_in_section.page_id;"; 
     var params = [sectionId];
 
     pool.query(query, params, (err, result) => {
@@ -86,9 +89,9 @@ function getPage(req, res) {
 
 function getEntries(req, res) {
     pageId = req.query.pageId;
-    var query = "SELECT page_in_journal.page_id, text_box.text_box_id FROM page_in_journal" +
-    " INNER JOIN page_text ON page_in_journal.page_id = page_text.page_fk AND page_text.page_fk = $1" +
-    " INNER JOIN text_box ON page_text.text_fk = page_in_journal.page_id;"; 
+    var query = "SELECT page_in_section.page_id, text_box.text_box_id FROM page_in_section" +
+    " INNER JOIN page_text ON page_in_section.page_id = page_text.page_fk AND page_text.page_fk = $1" +
+    " INNER JOIN text_box ON page_text.text_fk = text_box.text_box_id;"; 
     var params = [pageId];
 
     pool.query(query, params, (err, result) => {
@@ -106,7 +109,7 @@ function getTextData(req, res) {
     textBoxId = req.query.textBoxId;
     //pageId = req.query.pageId;
     var query = "SELECT text_content FROM text_box WHERE text_box_id = $1";
-    //var query2 = "SELECT page_title FROM page_in_journal WHERE page_id = $1";
+    //var query2 = "SELECT page_title FROM page_in_section WHERE page_id = $1";
     params = [textBoxId/*, pageId*/];
     pool.query(query, params, (err, result) => {
         if (err || result == null){
