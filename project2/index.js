@@ -162,6 +162,7 @@ function postEntry(req, res) {
 }
 
 function postLogin(req, res) {
+
     var username = req.body.username;
     var password = req.body.password;
     var sql = "SELECT user_id FROM user_file WHERE username = $1 AND user_password = $2;";
@@ -181,7 +182,6 @@ function postLogin(req, res) {
 
             res.sendFile(path.normalize(__dirname + "/public/main.html"));
         }
-
     });
 }
 

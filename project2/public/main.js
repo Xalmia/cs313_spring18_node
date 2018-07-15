@@ -133,8 +133,3 @@ function saveEntry(boxId) {
         }
     });
 }
-
-function postLogin() {
-    var url = "/postLogin";
-    var
-}
