@@ -166,12 +166,7 @@ function postLogin(req, res) {
     var password = req.body.password;
     var sql = "SELECT user_id FROM user_file WHERE username = $1 AND user_password = $2;";
     var params = [username, password];
-
-    console.log("Username for login: " + username);
-
     pool.query(sql, params, (err, result) => {
-        console.log(result.rows[0]);
-        console.log(result.rows);
         // if the login succeeds, return the main HTML document and set the username as a session variable, if it fails return to login.html?login=0
         // make sure to set the render engine to html.
 
@@ -179,10 +174,11 @@ function postLogin(req, res) {
             console.log("An error has occured: " + err);
         } else if (result.rows[0] == null){
             console.log("Query is null");
+            res.sendFile(path.normalize(__dirname + "/public/login.html"));
         } else {
             req.session.username = username;
             req.session.userId = result.rows[0].user_id;
-            console.log("User Id: " + req.session.userId);
+
             res.sendFile(path.normalize(__dirname + "/public/main.html"));
         }
 

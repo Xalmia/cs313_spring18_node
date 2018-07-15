@@ -6,6 +6,7 @@ function displayJournals() {
         if (result != null){
             // populate the main display div with information
             $("#pageTitle").empty();
+            $("#saveResults").empty();
             $("#pageTitle").append("Journaling Applitcation!!");
             $("#sectionTable").empty();
             $("#sectionTable").append("<table><tr><td><h2>Journals</h2></td><td><h2>Sections</h2></td><td><h2>Pages</h2></td><td><h2>Entries</h2></td></tr>" + 
