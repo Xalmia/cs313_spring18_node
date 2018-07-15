@@ -3,6 +3,7 @@ var app = express();
 var path = require('path');
 var PORT = process.env.PORT || 5000
 var methodOverride = require('method-override');
+var session = require('client-sessions');
 const { Pool } = require('pg');
 
 const connectionString = process.env.DATABASE_URL || "postgres://journal_user:journal_pass@localhost:5432/journal"
@@ -13,7 +14,12 @@ app.set('port', PORT)
    .use(express.json())
    .use(express.urlencoded())
    .use(express.static(__dirname + "/public"))
-   .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'main.html'));})
+   .use(session({
+    cookieName: 'session',
+    secret: "Super-secret1212",
+    duration: 30 * 60 * 1000
+    }))
+   .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html'));})
    .get('/getJournal', getJournal)
    .get('/getSection', getSection)
    .get('/getPage', getPage)
@@ -23,6 +29,7 @@ app.set('port', PORT)
    .post('/postSection', postSection)
    .post('/postPage', postPage)
    .post('/postEntry', postEntry)
+   .post('/postLogin', postLogin)
    .put('/putJournal', putJournal)
    .put('/putSection', putSection)
    .put('/putPage', putPage)
@@ -32,7 +39,7 @@ app.set('port', PORT)
 
 // since there is no EJS to render JUST yet, just use the json display engine
 function getJournal(req, res) {
-    userId = req.query.id;
+    userId = req.session.userId;
     // TODO: This query needs to be joined with the User table though the user_journal table
     var query = "SELECT user_file.user_id, journal.journal_id, journal.journal_title FROM user_file" +
     " INNER JOIN user_journal ON user_file.user_id = user_journal.user_fk AND user_journal.user_fk = $1" +
@@ -143,10 +150,38 @@ function postEntry(req, res) {
     var sql = "UPDATE text_box SET text_content = $1 WHERE text_box_id = $2::int;";
     var params = [textValue, entryId];
 
-    pool.query(sql, params, (result) => {
-        res.json({success: true});
+    pool.query(sql, params, (err, result) => {
+        console.log(result);
+        if (err == null){
+            res.json({success: true});
+        } else {
+            res.json({success: false});
+        }
     });
 
+}
+
+function postLogin(req, res) {
+    var username = req.body.username;
+    var password = req.body.password;
+    var sql = "SELECT user_id FROM user_file WHERE username = $1 AND user_password = $2;";
+    var params = [username, password];
+    
+    pool.query(sql, params, (err, result) => {
+        console.log(result.rows[0]);
+        console.log(result.rows);
+        // if the login succeeds, return the main HTML document and set the username as a session variable, if it fails return to login.html?login=0
+        // make sure to set the render engine to html.
+        if (err != null) {
+            console.log("An error has occured: " + err);
+        } else {
+            req.session.username = username;
+            req.session.userId = result.rows[0].user_id;
+            console.log("User Id: " + req.session.userId);
+            res.sendFile(path.normalize(__dirname + "/public/main.html"));
+        }
+
+    });
 }
 
 function putJournal(req, res) {

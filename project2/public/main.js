@@ -1,9 +1,6 @@
 function displayJournals() {
-    // run this when the body loads
-    // right now this value is hard coded, but soon it will be obtained from a session variable on login.
-    var userId = 2;//location.search.split('myParam=')[1]
-    url = "/getJournal?id=" + userId; 
-    console.log("Got a request to start a journal display!");
+    url = "/getJournal"; 
+
     // run an AJAX request for the data in getJournal in index.js
     $.get(url, (result) => {
         if (result != null){
