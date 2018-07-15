@@ -10,6 +10,8 @@ const pool = new Pool({connectionString: connectionString});
 
 app.set('port', PORT)
    .use(methodOverride('_method'))
+   .use(express.json())
+   .use(express.urlencoded())
    .use(express.static(__dirname + "/public"))
    .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'main.html'));})
    .get('/getJournal', getJournal)
@@ -20,6 +22,7 @@ app.set('port', PORT)
    .post('/postJournal', postJournal)
    .post('/postSection', postSection)
    .post('/postPage', postPage)
+   .post('/postEntry', postEntry)
    .put('/putJournal', putJournal)
    .put('/putSection', putSection)
    .put('/putPage', putPage)
@@ -107,10 +110,10 @@ function getEntries(req, res) {
 
 function getTextData(req, res) {
     textBoxId = req.query.textBoxId;
-    //pageId = req.query.pageId;
-    var query = "SELECT text_content FROM text_box WHERE text_box_id = $1";
-    //var query2 = "SELECT page_title FROM page_in_section WHERE page_id = $1";
-    params = [textBoxId/*, pageId*/];
+    pageId = req.query.pageId;
+    var query = "SELECT text_box.text_content, page_in_section.page_title FROM text_box" + 
+                " INNER JOIN page_in_section ON page_in_section.page_id = $2 WHERE text_box.text_box_id = $1;";
+    params = [textBoxId, pageId];
     pool.query(query, params, (err, result) => {
         if (err || result == null){
             console.log("Error getting section: " + err);
@@ -134,6 +137,18 @@ function postPage(req, res) {
     res.json({post: "success", type: "page"});
 }
 
+function postEntry(req, res) {
+    var entryId = req.body.textBoxId;
+    var textValue = req.body.textValue;
+    var sql = "UPDATE text_box SET text_content = $1 WHERE text_box_id = $2::int;";
+    var params = [textValue, entryId];
+
+    pool.query(sql, params, (result) => {
+        res.json({success: true});
+    });
+
+}
+
 function putJournal(req, res) {
     res.json({put: "success", type: "journal"});
 }
@@ -145,3 +160,4 @@ function putSection(req, res) {
 function putPage(req, res) {
     res.json({put: "success", type: "page"});
 }
+

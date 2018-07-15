@@ -13,3 +13,6 @@ INNER JOIN journal ON user_journal.journal_fk = journal.journal_id;
 SELECT page_in_section.page_id, text_box.text_box_id FROM page_in_section
 INNER JOIN page_text ON page_in_section.page_id = page_text.page_fk AND page_text.page_fk = 1
 INNER JOIN text_box ON page_text.text_fk = text_box.text_box_id;
+
+SELECT text_box.text_content, page_in_section.page_title FROM text_box
+INNER JOIN page_in_section ON page_in_section.page_id = 1 WHERE text_box.text_box_id = 1;

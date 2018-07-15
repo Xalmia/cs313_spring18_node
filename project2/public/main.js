@@ -3,21 +3,28 @@ function displayJournals() {
     // right now this value is hard coded, but soon it will be obtained from a session variable on login.
     var userId = 2;//location.search.split('myParam=')[1]
     url = "/getJournal?id=" + userId; 
-
+    console.log("Got a request to start a journal display!");
     // run an AJAX request for the data in getJournal in index.js
     $.get(url, (result) => {
         if (result != null){
+            // populate the main display div with information
+            $("#pageTitle").empty();
+            $("#pageTitle").append("Journaling Applitcation!!");
+            $("#sectionTable").empty();
+            $("#sectionTable").append("<table><tr><td><h2>Journals</h2></td><td><h2>Sections</h2></td><td><h2>Pages</h2></td><td><h2>Entries</h2></td></tr>" + 
+            "<tr><form><td id='journals'></td><td id='sections'></td><td id='pages'></td><td id='entries'></td></form></tr></table>");
+            $("#pageResults").empty();
             for (data in result){
                 $("#journals").append("<li class=\'no-dot\'>" + result[data].journal_title + "<button onclick=\'displaySections(" + result[data].journal_id + ")\'><i class=\'right\'</i></button></li>")
             }
         } else if(result.success == false){
             console.log ("Query failed.");
-            $('#journals').empty();
-            $("#journals").append("Unable to get journals, Query failure.");
+            $('#sectionTable').empty();
+            $("#sectionTable").append("Unable to get journals, Query failure.");
         } else {
             console.log("Error getting section");
-            $('#journals').empty();
-            $("#journals").append("Unable to get journals")
+            $('#sectionTable').empty();
+            $("#sectionTable").append("Unable to get journals")
         }
     });
     // take the returned JSON object and build a <ul> with each journal as an <li>.
@@ -89,16 +96,16 @@ function displayEntries(pageId){
 }
 
 function loadSelectedPage(text_box_id, pageId) {
-    url = "/getTextData?textBoxId=" + text_box_id/* + "&pageId=" + pageId*/;
+    url = "/getTextData?textBoxId=" + text_box_id + "&pageId=" + pageId;
     
     $.get(url, (result) => {
         if (result != null){
             $("#sectionTable").empty();
             
             for (data in result){
-                //$("#pageTitle").empty();
-                //$("#pageTitle").append(result[data].page_title);
-                $("#sectionTable").append("<div id='textBox' class='textBox'>" + result[data].text_content +"</div>");
+                $("#pageTitle").empty();
+                $("#pageTitle").append("<button onclick='displayJournals()'><i class='left'></i></button>" + result[data].page_title + "<button onclick='saveEntry(" + text_box_id + ")'>Save Entry</button>");
+                $("#sectionTable").append("<div id='textBox' class='textBox'> <textarea id='entryText'>" + result[data].text_content +"</textarea></div>");
             }
         } else if(result.success == false){
             console.log ("Query failed.");
@@ -108,6 +115,23 @@ function loadSelectedPage(text_box_id, pageId) {
             console.log("Error getting page");
             $('#entries').empty();
             $("#entries").append("Unable to get entry text")
+        }
+    });
+}
+
+function saveEntry(boxId) {
+    var url = "/postEntry";
+    var textBox = document.getElementById("entryText").value;
+    // should probably add some field validation here in case of null fields.
+    $.post(url, {textBoxId: boxId, textValue: textBox}).done((result) => {
+        console.log(result);
+        if (result.success == true){
+            $("#saveResults").empty();
+            $("#saveResults").append("Save successful");
+        } else {
+            $("#saveResults").empty();
+            $("#saveResult").append("Save Failed!");
+
         }
     });
 }
