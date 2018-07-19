@@ -19,23 +19,40 @@ app.set('port', PORT)
     secret: "Super-secret1212",
     duration: 30 * 60 * 1000
     }))
-   .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html'));})
+   .get('/', (req, res) => {res.sendFile(path.join(__dirname, 'public', 'login.html')); })
+   .get('/main', validateLogin, (req, res) => {res.sendFile(path.join(__dirname, 'public', 'main.html')); })
    .get('/getJournal', getJournal)
    .get('/getSection', getSection)
    .get('/getPage', getPage)
    .get('/getEntries', getEntries)
    .get('/getTextData', getTextData)
-   .post('/postJournal', postJournal)
+   .get('/logout', getLogout)
    .post('/postSection', postSection)
    .post('/postPage', postPage)
    .post('/postEntry', postEntry)
    .post('/postLogin', postLogin)
-   .put('/putJournal', putJournal)
-   .put('/putSection', putSection)
-   .put('/putPage', putPage)
+   .post('/postNewJournal', postNewJournal)
+   .delete('/deleteJournal', deleteJournal)
    .listen(PORT, () => {
     console.log("listening on port: " + PORT);
 });
+
+/*
+    MIDDLEWARE ---------------------------------------------------------------------------------------------
+*/
+
+// If the user has a session, allow them to continue! Else, BACK TO THE PITS -- *ahem*... Login...
+function validateLogin(req, res, next) {
+    if (req.session.hasOwnProperty("username")){
+        next()
+    } else {
+        res.redirect('/');
+    }
+}
+
+/* 
+    GETS ----------------------------------------------------------------------------------------------------
+*/
 
 // since there is no EJS to render JUST yet, just use the json display engine
 function getJournal(req, res) {
@@ -132,9 +149,18 @@ function getTextData(req, res) {
     });
 }
 
-function postJournal(req, res) {
-    res.json({post: "success", type: "journal"});
+function getLogout(req, res) {
+    if(req.session.hasOwnProperty("username")){
+        req.session.reset();
+        res.redirect('/');
+    } else {
+        res.redirect('/');
+    }
 }
+
+/*
+    POST ------------------------------------------------------------------------------------------------------------
+*/
 
 function postSection(req, res) {
     res.json({post: "success", type: "section"});
@@ -167,33 +193,120 @@ function postLogin(req, res) {
     var password = req.body.password;
     var sql = "SELECT user_id FROM user_file WHERE username = $1 AND user_password = $2;";
     var params = [username, password];
+
+    console.log ("login reached with username: " + username);
+
     pool.query(sql, params, (err, result) => {
         // if the login succeeds, return the main HTML document and set the username as a session variable, if it fails return to login.html?login=0
         // make sure to set the render engine to html.
 
         if (err != null) {
-            console.log("An error has occured: " + err);
+            console.log("username from input: " + username);
+            console.log("An error has occured in login: ");
+            console.log(err);
         } else if (result.rows[0] == null){
             console.log("Query is null");
             res.sendFile(path.normalize(__dirname + "/public/login.html"));
         } else {
             req.session.username = username;
             req.session.userId = result.rows[0].user_id;
-
-            res.sendFile(path.normalize(__dirname + "/public/main.html"));
+            filePath = path.normalize(__dirname + "/public/main.html")
+            console.log("Attempting redirect to main");
+            res.redirect("/main");
         }
     });
 }
 
-function putJournal(req, res) {
-    res.json({put: "success", type: "journal"});
+function postNewJournal(req, res) {
+    var journalTitle = req.body.journalTitle;
+    var username = req.session.username;
+    var userSql = "SELECT user_id FROM user_file WHERE username = $1;";
+    var journalSql = "INSERT INTO journal(journal_title) VALUES ($1) RETURNING journal_id;";
+    var user_journalSql = "INSERT INTO user_journal(user_fk, journal_fk) VALUES ($1, $2);";
+    var userParams = [username];
+    var journalParams = [journalTitle];
+    var user_journalParams;
+    var journalId;
+    var userId;
+
+    //initalize the pool ending sequence when the pool is not in use
+    pool.on('error', (err, client) => {
+        console.error('Unexpected error on idle client', err)
+        res.json({success: false});
+      })
+
+    // This section is nasty, I really should put all these callbacks in their own functions, shame on me.
+    pool.connect((err, client, done) => {
+        if (err) throw err
+        // first get the user ID
+        client.query(userSql, userParams, (err, result1) => {
+
+            if (err) {
+            console.log("Error in user query: " + err.stack)
+            } else {
+                userId = result1.rows[0].user_id;
+                // next get the insert the journal, and get the new ID with the RETURNS command
+                client.query(journalSql, journalParams, (err, result2) => {
+                    if (err) {
+                        console.log("Error in adding journal " + err.stack);
+                    } else {
+                        console.log(result2.rows[0]);
+                        journalId = result2.rows[0].journal_id;
+                        // now that we have all the variables we need, start the final query.
+                        user_journalParams = [userId, journalId];
+                        client.query(user_journalSql, user_journalParams, (err, result3) => {
+                            done();
+                            if (err) {
+                                // delete the last journal added.
+                                console.log(err.stack);
+                            } else {
+                                res.json({success: true});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    
 }
 
-function putSection(req, res) {
-    res.json({put: "success", type: "section"});
-}
+function deleteJournal(request, response) {
+    var journalId = request.body.journalId;
+    var j_sDeleteSql = "DELETE FROM journal_section WHERE journal_fk = $1";
+    var u_jDeleteSql = "DELETE FROM user_journal WHERE journal_fk = $1;";
+    var jDeleteSql = "DELETE FROM journal WHERE journal_id = $1;";
+    var jDeleteParams = [journalId];
 
-function putPage(req, res) {
-    res.json({put: "success", type: "page"});
-}
+    console.log("Dumping request: ");
+    console.log(request.body);
 
+    /* 
+    */
+   pool.connect((err, client, finished) => {
+    if (err) throw err;
+        //first try to delete any section constraints
+        client.query(j_sDeleteSql, jDeleteParams, (err, result) => {
+            if (err){
+                console.log("Error deleting the journal_section")
+            } else {
+                client.query(u_jDeleteSql, jDeleteParams, (err, result) => {
+                    if (err) {
+                        console.log("Error deleting the user_journal constraint: " + err.stack);
+                    } else {
+                        // deleting the journals must be the last query for key constraints.
+                        client.query(jDeleteSql, jDeleteParams, (err, result) => {
+                            if (err) {
+                                console.log("Error deleting Journal: " + err.stack);
+                                response.json({success: false, data: "cascade"});
+                            } else {
+                                response.json({success: true});
+                            }
+                        }); // query to delete journal
+                    }
+                }); // query to delete user
+            }
+        }); // query to delete journal_section
+   });
+}

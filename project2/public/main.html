@@ -5,17 +5,29 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Journal Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://icono-49d6.kxcdn.com/icono.min.css">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="main.js"></script>
 </head>
 <body onload="displayJournals()">
-    <header>
-        <h1 id='pageTitle'><!--This information is populated with Javascript--></h1>
-    </header>
-    <div id='saveResults'></div>
-    <div id='sectionTable'>
-        <!--This information is populated with Javascript-->
-    </div>
+    <div class='container'>
+        <header>
+            <div class='row'>
+                <h1 id='appTitle' class='col-md-4'><!--This information is populated with Javascript--></h1>
+                <div id='newItem' class='col-md-4'></div>
+                <div id='logout' class='col-md-4'>
+                    <form method="GET" action="/logout">
+                        <button class='btn btn-info btn-sm align-right' type="submit">Logout!</button>
+                    </form>
+                </div>
+            </div>
+        </header>
+        <div id='saveResults'></div>
+        <div id='sectionTable'>
+            <!--This information is populated with Javascript-->
+        </div>
+    </div>    
 </body>
 </html>

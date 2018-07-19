@@ -11,6 +11,7 @@
     "test": "node test.js"
   },
   "dependencies": {
+    "bootstrap": "^4.1.2",
     "client-sessions": "^0.8.0",
     "ejs": "^2.5.6",
     "express": "^4.16.3",
@@ -20,6 +21,7 @@
     "pg": "^7.4.3"
   },
   "devDependencies": {
+    "grunt": "^1.0.3",
     "request": "^2.81.0",
     "tape": "^4.7.0"
   },

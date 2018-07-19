@@ -154,6 +154,7 @@ VALUES ('2', '2');
 CREATE USER journal_user WITH PASSWORD 'journal_pass';
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO journal_user;
 GRANT INSERT, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO journal_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO journal_user;
 */
 
 DROP TABLE image_box, image_handler, journal, journal_section, page_image, page_in_section, page_text, section, section_page, text_box, user_file, user_journal;
