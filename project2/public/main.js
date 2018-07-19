@@ -37,7 +37,8 @@ function displaySections(journalId) {
     $.get(url, (result) => {
         if (result != null){
             $("#sections").empty();
-            $("#sectionTitle").append("<button class='btn btn-info btn-sm'><i class='icono-plus black'></i></button>")
+            $("#sectionTitle").empty();
+            $("#sectionTitle").append("Sections <button class='btn btn-info btn-sm'><i class='icono-plus black'></i></button>")
                 for (data in result){
                 $("#sections").append("<li class=\'no-dot\'><button class='btn btn-info btn-sm black' onclick='deleteSection(" + result[data].section_id + ")'> - </button>" + result[data].section_title + "<button class='btn btn-info btn-sm'" + 
                 "onclick=\'displayPages(" + result[data].section_id + ")\'><i class=\'right arrow\'</i></button></li>");
@@ -60,7 +61,8 @@ function displayPages(sectionId) {
     $.get(url, (result) => {
         if (result != null){
             $("#pages").empty();
-            $("#pageTitle").append("<button class='btn btn-info btn-sm'><i class='icono-plus black'></i></button>")
+            $("#pageTitle").empty();
+            $("#pageTitle").append("Pages <button class='btn btn-info btn-sm'><i class='icono-plus black'></i></button>")
                 for (data in result){
                 $("#pages").append("<li class=\'no-dot\'>" + result[data].page_title + "<button class='btn btn-info btn-sm'" + 
                 "onclick=\'displayEntries(" + result[data].page_id + ")\'><i class=\'right arrow\'</i></button></li>");
@@ -84,7 +86,8 @@ function displayEntries(pageId){
         if (result != null){
             $("#entries").empty();
             var count = 1;
-            $("#entryTitle").append("<button class='btn btn-info btn-sm' data-toggle='modal' data-target='#myModal'><i class='icono-plus black'></i></button>")
+            $('#entryTitle').empty();
+            $("#entryTitle").append("Entries <button class='btn btn-info btn-sm' data-toggle='modal' data-target='#myModal'><i class='icono-plus black'></i></button>")
             for (data in result){
                 $("#entries").append("<li class=\'no-dot\'> Entry #" + count++ + "<button class='btn btn-info btn-sm' " + 
                 "onclick=\'loadSelectedPage(" + result[data].text_box_id + ", " + pageId + ")\'><i class=\'right arrow\'</i></button></li>");
