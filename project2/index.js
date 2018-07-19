@@ -30,9 +30,12 @@ app.set('port', PORT)
    .post('/postSection', validateLogin, postSection)
    .post('/postPage', validateLogin, postPage)
    .post('/postEntry', validateLogin, postEntry)
-   .post('/postLogin', validateLogin, postLogin)
+   // Exclude the login check for the postLogin, otherwise the user cant login.
+   .post('/postLogin', postLogin)
    .post('/postNewJournal', validateLogin, postNewJournal)
+   .post('/postNewSection', postNewSection)
    .delete('/deleteJournal', validateLogin, deleteJournal)
+   .delete('/deleteSection', deleteSection)
    .listen(PORT, () => {
     console.log("listening on port: " + PORT);
 });
@@ -90,7 +93,7 @@ function getSection(req, res) {
             console.log("Error getting section: " + err);
             res.json({success: false, data:err});
         } else {
-            console.log("Found result: " + JSON.stringify(result.rows));
+            console.log("Found Section result: " + JSON.stringify(result.rows));
             res.json(result.rows);
         }
     });
@@ -105,7 +108,7 @@ function getPage(req, res) {
 
     pool.query(query, params, (err, result) => {
         if (err || result == null){
-            console.log("Error getting section: " + err);
+            console.log("Error getting page: " + err);
             res.json({success: false, data:err});
         } else {
             console.log("Found result: " + JSON.stringify(result.rows));
@@ -123,7 +126,7 @@ function getEntries(req, res) {
 
     pool.query(query, params, (err, result) => {
         if (err || result == null){
-            console.log("Error getting section: " + err);
+            console.log("Error getting entry: " + err);
             res.json({success: false, data:err});
         } else {
             console.log("Found result: " + JSON.stringify(result.rows));
@@ -244,13 +247,11 @@ function postNewJournal(req, res) {
             if (err) {
             console.log("Error in user query: " + err.stack)
             } else {
-                userId = result1.rows[0].user_id;
                 // next get the insert the journal, and get the new ID with the RETURNS command
                 client.query(journalSql, journalParams, (err, result2) => {
                     if (err) {
                         console.log("Error in adding journal " + err.stack);
                     } else {
-                        console.log(result2.rows[0]);
                         journalId = result2.rows[0].journal_id;
                         // now that we have all the variables we need, start the final query.
                         user_journalParams = [userId, journalId];
@@ -268,9 +269,47 @@ function postNewJournal(req, res) {
             }
         });
     });
-
-    
 }
+
+function postNewSection(req, res) {
+    var sectionTitle = req.body.sectionTitle;
+    var journalId = req.body.journalId;
+
+    console.log("Section Title: " + sectionTitle);
+    console.log("journalID: " + journalId);
+
+    var sectionInsertSql = "INSERT INTO section(section_title) VALUES ($1) RETURNING section_id;"
+    var j_sInsertSql = "INSERT INTO journal_section(journal_fk, section_fk) VALUES ($1, $2);";
+
+    pool.connect((err, client, finished) =>{
+        if (err) throw err;
+
+        client.query(sectionInsertSql, [sectionTitle], (err, result1) => {
+            if (err) {
+                console.log("There was an error inserting a new section: " + err.stack);
+                res.json({success: false});
+            } else {
+                var sectionId = result1.rows[0].section_id;
+                
+                console.log("section ID: " + sectionId);
+
+                client.query(j_sInsertSql, [journalId, sectionId], (err, result2) => {
+                    if (err) {
+                        //delete newly created section, theres been a problem.
+                        console.log("There wa an error inserting a new journal_section" + err.stack);
+                        res.json({success: false});
+                    } else {
+                        res.json({success: true});
+                    }
+                });
+            }
+        });
+    });
+}
+
+/*
+    DELETE ----------------------------------------------------------------------------------------------------
+*/
 
 function deleteJournal(request, response) {
     var journalId = request.body.journalId;
@@ -297,8 +336,49 @@ function deleteJournal(request, response) {
                     } else {
                         // deleting the journals must be the last query for key constraints.
                         client.query(jDeleteSql, jDeleteParams, (err, result) => {
+                            finished();
                             if (err) {
                                 console.log("Error deleting Journal: " + err.stack);
+                                response.json({success: false, data: "cascade"});
+                            } else {
+                                response.json({success: true});
+                            }
+                        }); // query to delete journal
+                    }
+                }); // query to delete user
+            }
+        }); // query to delete journal_section
+   });
+}
+
+function deleteSection(request, response) {
+    var sectionId = request.body.sectionId;
+    var j_sDeleteSql = "DELETE FROM journal_section WHERE section_fk = $1";
+    var s_pDeleteSql = "DELETE FROM section_page WHERE section_fk = $1;";
+    var sDeleteSql = "DELETE FROM section WHERE section_id = $1;";
+    var sDeleteParams = [sectionId];
+
+    console.log("Dumping request section: ");
+    console.log(request.body);
+
+    /* 
+    */
+   pool.connect((err, client, finished) => {
+    if (err) throw err;
+        //first try to delete any section constraints
+        client.query(j_sDeleteSql, sDeleteParams, (err, result) => {
+            if (err){
+                console.log("Error deleting the journal_section")
+            } else {
+                client.query(s_pDeleteSql, sDeleteParams, (err, result) => {
+                    if (err) {
+                        console.log("Error deleting the section_page constraint: " + err.stack);
+                    } else {
+                        // deleting the journals must be the last query for key constraints.
+                        client.query(sDeleteSql, sDeleteParams, (err, result) => {
+                            finished();
+                            if (err) {
+                                console.log("Error deleting Section: " + err.stack);
                                 response.json({success: false, data: "cascade"});
                             } else {
                                 response.json({success: true});

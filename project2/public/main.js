@@ -38,9 +38,9 @@ function displaySections(journalId) {
         if (result != null){
             $("#sections").empty();
             $("#sectionTitle").empty();
-            $("#sectionTitle").append("Sections <button class='btn btn-info btn-sm'><i class='icono-plus black'></i></button>")
+            $("#sectionTitle").append("Sections <button onclick='addSectionInput(" + journalId + ")' class='btn btn-info btn-sm'><i class='icono-plus black'></i></button>")
                 for (data in result){
-                $("#sections").append("<li class=\'no-dot\'><button class='btn btn-info btn-sm black' onclick='deleteSection(" + result[data].section_id + ")'> - </button>" + result[data].section_title + "<button class='btn btn-info btn-sm'" + 
+                $("#sections").append("<li class=\'no-dot\'><button class='btn btn-info btn-sm black' onclick='deleteSection(" + result[data].section_id + ", " + journalId + ")'> - </button>" + result[data].section_title + "<button class='btn btn-info btn-sm'" + 
                 "onclick=\'displayPages(" + result[data].section_id + ")\'><i class=\'right arrow\'</i></button></li>");
             }
         } else if(result.success == false){
@@ -152,12 +152,17 @@ function saveEntry(boxId) {
 function addJournalInput() {
     //generate a bootstrap input object
     $("#journals").append("<div class='input-group mb-3'>" + 
+    "<div class='input-group-prepend'><button class='btn btn-sm btn-outline-secondary' onclick='displayJournals()' type='button'><i class='icono-cross black'></i></button></div>" + 
     "<input type='text' class='form-control' placeholder='Journal Title' id='newJournalTitle' aria-label='New Journal' aria-describedby='basic-addon2'>" +
-    "<div class='input-group-append'><button onclick='addJournal()' class='btn btn-outline-secondary' type='button'>Button</button></div></div>")
+    "<div class='input-group-append'><button onclick='addJournal()' class='btn btn-sm btn-outline-secondary' type='button'><i class='icono-plusCircle black'></i></button></div></div>")
 }
 
 function addSectionInput(journalId) {
     //generate a bootstrap input object
+    $("#sections").append("<div class='input-group mb-3'>" + 
+    "<div class='input-group-prepend'><button class='btn btn-sm btn-outline-secondary' onclick='displaySections(" + journalId + ")' type='button'><i class='icono-cross black'></i></button></div>" + 
+    "<input type='text' class='form-control' placeholder='Section Title' id='newSectionTitle' aria-label='New Section' aria-describedby='basic-addon2'>" +
+    "<div class='input-group-append'><button onclick='addSection(" + journalId + ")' class='btn btn-sm btn-outline-secondary' type='button'><i class='icono-plusCircle black'></i></button></div></div>")
 }
 
 function addPageInput() {
@@ -168,32 +173,43 @@ function addEntryInput() {
     //generate a bootstrap input object
 }
 
+function removeJournalInput() {
+    displayJournals();
+}
+
 /*
     FUNCTIONS FOR STARTING POST REQUESTS
 */
 
 function addJournal() {
+
     url = '/postNewJournal';
     var journalTitle = document.getElementById("newJournalTitle").value;
 
-    $.post(url, {journalTitle: journalTitle}, (err, result) => {
-        if (err == null) {
-
-        } else {
-            // query succeeded, redisplay the field.
-            displayJournals();
-        }
-    });
+    if (journalTitle == "" || journalTitle == null){
+        $('#saveResults').empty();
+        $('#saveResults').append("Cannot add an empty journal.")
+    } else {
+        $.post(url, {journalTitle: journalTitle}, (result) => {
+            if (result == null) {
+                // Theres been a problem!
+            } else {
+                // query succeeded, redisplay the field.
+                displayJournals();
+            }
+        });
+    }
 }
 
 function addSection(journalId) {
-    url = '/postNewSection';
-    $.post(url, {journalId: journalId}, (err, result) => {
-        if (err) {
+    var url = '/postNewSection';
+    var sectionTitle = document.getElementById("newSectionTitle").value;
 
+    $.post(url, {journalId: journalId, sectionTitle: sectionTitle}, (result) => {
+        if (result == null) {
+            // Theres been a problem!
         } else {
             // query succeeded, redisplay the field.
-            
             displaySections(journalId);
         }
     });
@@ -223,9 +239,27 @@ function deleteJournal(journalId) {
         success: (result) => {
             if (result.success){
                 displayJournals();
-            } else if (resilt.data == "cascade") {
+            } else if (result.data == "cascade") {
                 $('#saveResults').empty();
                 $('#saveResults').append("Error, Journal still has sections.");
+            }
+        }
+    });
+}
+
+function deleteSection(sectionId, journalId) {
+    url = '/deleteSection'
+
+    $.ajax({
+        url: url,
+        type: 'DELETE',
+        data: {sectionId: sectionId},
+        success: (result) => {
+            if (result.success){
+                displaySections(journalId);
+            } else if (result.data == "cascade") {
+                $('#saveResults').empty();
+                $('#saveResults').append("Error, Sections still has pages.");
             }
         }
     });
